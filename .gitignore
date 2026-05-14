@@ -1,0 +1,78 @@
+# =========================
+# Node Modules (Both)
+# =========================
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# =========================
+# Environment Files
+# =========================
+.env
+.env.*
+backend/.env
+frontend/.env
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =========================
+# Build / Dist
+# =========================
+dist/
+build/
+frontend/build/
+frontend/dist/
+
+# =========================
+# Uploads (user files)
+# =========================
+backend/uploads/
+uploads/
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Cache / Temp
+# =========================
+.cache/
+.tmp/
+temp/
+
+# =========================
+# Coverage
+# =========================
+coverage/
+
+# =========================
+# Package Lock (optional)
+# =========================
+# Uncomment if you don't want lock files
+# package-lock.json
+# yarn.lock
+
+# =========================
+# Misc
+# =========================
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
