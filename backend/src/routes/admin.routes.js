@@ -1,5 +1,14 @@
 const express = require("express");
-const { getDashboardStats, getEmployees, updateLeaveStatus, getPendingLeaves, uploadSalary } = require("../controllers/admin.controller");
+const {
+  getDashboardStats,
+  getEmployees,
+  createEmployee,
+  updateEmployee,
+  deleteEmployee,
+  updateLeaveStatus,
+  getPendingLeaves,
+  uploadSalary,
+} = require("../controllers/admin.controller");
 const { protect, authorize } = require("../middleware/auth.middleware");
 const upload = require("../middleware/upload.middleware");
 
@@ -10,6 +19,9 @@ router.use(authorize("admin"));
 
 router.get("/dashboard", getDashboardStats);
 router.get("/employees", getEmployees);
+router.post("/employees", createEmployee);
+router.put("/employees/:id", updateEmployee);
+router.delete("/employees/:id", deleteEmployee);
 router.get("/leaves/pending", getPendingLeaves);
 router.put("/leaves/:id/status", updateLeaveStatus);
 router.post("/salary/upload", upload.single("file"), uploadSalary);

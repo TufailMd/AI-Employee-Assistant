@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { ArrowRight, Bot, Building2, Eye, Lock, Mail } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -26,61 +28,115 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md border border-gray-100">
-        <div>
-          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10">
+      <div className="absolute inset-0 bg-[linear-gradient(115deg,#f8f9ff_0%,#eff4ff_50%,#dce9ff_100%)]" />
+      <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_50%_0%,rgba(70,72,212,0.12),transparent_58%)]" />
+
+      <main className="relative z-10 w-full max-w-[440px]">
+        <div className="mb-8 text-center">
+          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-white shadow-soft">
+            <Building2 size={24} />
+          </div>
+          <h1 className="text-2xl font-black tracking-tight text-primary">HR Intellect</h1>
+          <p className="mt-2 text-sm leading-6 text-on-surface-variant">
+            Intelligent human resources management for modern teams.
+          </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+
+        <section className="glass-panel rounded-xl p-6 shadow-soft sm:p-8">
+          <div className="mb-8 grid grid-cols-2 border-b border-outline-variant">
+            <button className="border-b-2 border-secondary pb-4 text-lg font-bold text-secondary" type="button">
+              Login
+            </button>
+            <Link
+              className="pb-4 text-center text-lg font-bold text-on-surface-variant transition hover:text-on-surface"
+              to="/signup"
+            >
+              Signup
+            </Link>
+          </div>
+
           {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm text-center">
+            <div className="mb-5 rounded-lg border border-error/20 bg-error-container px-4 py-3 text-sm font-semibold text-error">
               {error}
             </div>
           )}
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-              <input
-                type="email"
-                required
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400"
-            >
-              {loading ? "Signing in..." : "Sign in"}
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <label className="field-label" htmlFor="email">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" size={18} />
+                <input
+                  className="field-input pl-10"
+                  id="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  required
+                  type="email"
+                  value={email}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="field-label" htmlFor="password">
+                  Password
+                </label>
+                <button className="text-xs font-bold text-secondary hover:underline" type="button">
+                  Forgot password?
+                </button>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-outline" size={18} />
+                <input
+                  className="field-input pl-10 pr-11"
+                  id="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  required
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                />
+                <button
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-outline transition hover:text-on-surface"
+                  onClick={() => setShowPassword((value) => !value)}
+                  type="button"
+                >
+                  <Eye size={18} />
+                </button>
+              </div>
+            </div>
+
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant">
+              <input className="h-4 w-4 rounded border-outline-variant text-secondary focus:ring-secondary" type="checkbox" />
+              Remember me for 30 days
+            </label>
+
+            <button className="primary-button w-full py-4" disabled={loading} type="submit">
+              {loading ? "Signing in..." : "Sign In"}
+              <ArrowRight size={18} />
             </button>
+          </form>
+
+          <div className="mt-8 border-t border-outline-variant pt-6">
+            <div className="flex gap-4 rounded-xl border border-secondary/20 bg-secondary-container/30 p-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary text-white">
+                <Bot size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.12em] text-secondary">AI Powered Access</p>
+                <p className="mt-1 text-xs leading-5 text-on-surface-variant">
+                  Log in to access personalized HR workflows, leave intelligence, and salary answers.
+                </p>
+              </div>
+            </div>
           </div>
-          
-          <div className="text-center text-sm">
-            <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-              Don't have an account? Sign up
-            </Link>
-          </div>
-        </form>
-      </div>
+        </section>
+      </main>
     </div>
   );
 };

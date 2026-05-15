@@ -1,7 +1,7 @@
 const { HfInference } = require("@huggingface/inference");
 
-const hasOpenAIKey = Boolean(process.env.HF_TOKEN);
-const client = hasOpenAIKey ? new HfInference(process.env.HF_TOKEN) : null;
+const hasHuggingFaceToken = Boolean(process.env.HF_TOKEN?.startsWith("hf_"));
+const client = hasHuggingFaceToken ? new HfInference(process.env.HF_TOKEN) : null;
 
 const completion = async ({ instructions, input, json = false }) => {
   if (!client) {
@@ -72,4 +72,4 @@ const localEmbedding = (text) => {
   return vector.map((value) => value / magnitude);
 };
 
-module.exports = { completion, createEmbedding, hasOpenAIKey };
+module.exports = { completion, createEmbedding, hasOpenAIKey: hasHuggingFaceToken };

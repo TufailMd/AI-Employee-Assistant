@@ -2,6 +2,7 @@ const Leave = require("../models/Leave");
 const User = require("../models/User");
 const { inclusiveBusinessDays, normalizeDate } = require("../utils/date");
 const { syncEmployeeKnowledge } = require("./employeeContext.service");
+const { generateLeaveEmail } = require("./email.service");
 
 const applyLeave = async ({ employeeId, type, fromDate, toDate, reason }) => {
   const employee = await User.findById(employeeId);
@@ -47,6 +48,12 @@ const reviewLeave = async ({ leaveId, reviewerId, status, adminNote }) => {
     throw error;
   }
 
+  if (!["approved", "rejected"].includes(status)) {
+    const error = new Error("Leave status must be approved or rejected");
+    error.statusCode = 400;
+    throw error;
+  }
+
   leave.status = status;
   leave.adminNote = adminNote || "";
   leave.reviewedBy = reviewerId;
@@ -60,7 +67,14 @@ const reviewLeave = async ({ leaveId, reviewerId, status, adminNote }) => {
   }
 
   await syncEmployeeKnowledge(leave.employee._id);
-  return leave;
+  const emailDraft = await generateLeaveEmail({
+    employeeName: leave.employee.name,
+    status,
+    leave,
+    adminNote,
+  });
+
+  return { leave, emailDraft };
 };
 
 module.exports = { applyLeave, reviewLeave };

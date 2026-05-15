@@ -1,18 +1,165 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+@import "tailwindcss";
+@config "../tailwind.config.js";
+@source "./**/*.{js,jsx,ts,tsx}";
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f3f4f6;
+  background-color: #f8f9ff;
+  color: #0b1c30;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(198, 198, 205, 0.7);
+  }
+
+  .app-card {
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  }
+
+  .field-label {
+    color: #45464d;
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1rem;
+    text-transform: uppercase;
+  }
+
+  .field-input {
+    background: #ffffff;
+    border: 1px solid #c6c6cd;
+    border-radius: 0.25rem;
+    color: #0b1c30;
+    font-size: 0.875rem;
+    outline: none;
+    padding: 0.75rem 1rem;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+    width: 100%;
+  }
+
+  .field-input:focus {
+    border-color: #4648d4;
+    box-shadow: 0 0 0 4px rgba(70, 72, 212, 0.1);
+  }
+
+  .primary-button {
+    align-items: center;
+    background: #0b1220;
+    border-radius: 0.25rem;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 0.875rem;
+    font-weight: 800;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    transition: filter 160ms ease, opacity 160ms ease, transform 160ms ease;
+  }
+
+  .primary-button:hover {
+    filter: brightness(1.15);
+  }
+
+  .primary-button:active {
+    transform: scale(0.98);
+  }
+
+  .primary-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .secondary-button {
+    align-items: center;
+    background: #4648d4;
+    border-radius: 0.25rem;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 0.875rem;
+    font-weight: 800;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    transition: filter 160ms ease, opacity 160ms ease, transform 160ms ease;
+  }
+
+  .secondary-button:hover {
+    filter: brightness(1.1);
+  }
+
+  .secondary-button:active {
+    transform: scale(0.98);
+  }
+
+  .secondary-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .muted-button {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #c6c6cd;
+    border-radius: 0.25rem;
+    color: #45464d;
+    display: inline-flex;
+    font-size: 0.875rem;
+    font-weight: 700;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0.625rem 1rem;
+    transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+
+  .muted-button:hover {
+    border-color: #4648d4;
+    color: #4648d4;
+  }
+
+  .muted-button:active {
+    transform: scale(0.98);
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
 }

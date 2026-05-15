@@ -11,9 +11,9 @@ function App() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background text-on-surface">
       {user && <Navbar />}
-      <main className="flex-1 flex flex-col relative">
+      <main className={user ? "min-h-screen" : "min-h-screen"}>
         <Routes>
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
           <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/" />} />

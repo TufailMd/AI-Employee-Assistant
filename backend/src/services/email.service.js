@@ -1,4 +1,4 @@
-const { completion } = require("./openai.service");
+const { completion } = require("./ai.service");
 
 const fallbackLeaveEmail = ({ employeeName, status, leave }) => {
   const approved = status === "approved";

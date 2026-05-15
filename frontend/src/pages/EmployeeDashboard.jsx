@@ -1,13 +1,46 @@
-import { useEffect, useState } from "react";
-import { Calendar, DollarSign, Clock, CheckCircle, XCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Banknote,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  Download,
+  FileText,
+  HeartPulse,
+  Plane,
+  Plus,
+  Send,
+  Sparkles,
+  XCircle,
+} from "lucide-react";
 import api from "../api/axios";
 import Chatbot from "../components/Chatbot";
+
+const formatDate = (date) =>
+  date
+    ? new Date(date).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Not set";
+
+const statusStyles = {
+  pending: "bg-amber-50 text-amber-700 border-amber-200",
+  approved: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  rejected: "bg-red-50 text-red-700 border-red-200",
+};
+
+const statusIcons = {
+  pending: Clock3,
+  approved: CheckCircle2,
+  rejected: XCircle,
+};
 
 const EmployeeDashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   const [leaveType, setLeaveType] = useState("annual");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -18,7 +51,7 @@ const EmployeeDashboard = () => {
     try {
       const response = await api.get("/employee/dashboard");
       setData(response.data);
-    } catch (err) {
+    } catch {
       setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
@@ -26,6 +59,7 @@ const EmployeeDashboard = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDashboard();
   }, []);
 
@@ -45,139 +79,206 @@ const EmployeeDashboard = () => {
     }
   };
 
-  if (loading) return <div className="flex justify-center p-8">Loading...</div>;
-  if (error) return <div className="text-red-500 p-8 text-center">{error}</div>;
+  const leaveCards = useMemo(() => {
+    const balance = data?.user?.leaveBalance || {};
+    return [
+      { label: "Annual", value: balance.annual ?? 0, icon: Plane, color: "text-secondary", bg: "bg-secondary-container" },
+      { label: "Sick", value: balance.sick ?? 0, icon: HeartPulse, color: "text-error", bg: "bg-error-container" },
+      { label: "Casual", value: balance.casual ?? 0, icon: CalendarDays, color: "text-sky-700", bg: "bg-tertiary-fixed" },
+    ];
+  }, [data]);
+
+  if (loading) {
+    return (
+      <div className="lg:ml-72 flex min-h-screen items-center justify-center px-6 pt-20">
+        <div className="app-card px-6 py-4 text-sm font-semibold text-on-surface-variant">Loading workspace...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="lg:ml-72 px-6 pt-28 text-center font-semibold text-error">{error}</div>;
+  }
+
+  const salary = data.latestSalary;
+  const salaryValue = salary ? `${salary.currency} ${salary.netPay ?? salary.basePay}` : "N/A";
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Welcome, {data.user.name}</h1>
-        <p className="text-gray-500">{data.user.designation} • {data.user.department}</p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
-            <Calendar size={24} />
-          </div>
+    <div className="lg:ml-72 min-h-screen px-4 pb-24 pt-24 sm:px-6 lg:pb-10">
+      <div className="mx-auto max-w-7xl space-y-8">
+        <section className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <p className="text-sm font-medium text-gray-500">Annual Leave</p>
-            <p className="text-2xl font-bold text-gray-900">{data.user.leaveBalance.annual}</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
-            <Calendar size={24} />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Sick Leave</p>
-            <p className="text-2xl font-bold text-gray-900">{data.user.leaveBalance.sick}</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-lg flex items-center justify-center">
-            <Calendar size={24} />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Casual Leave</p>
-            <p className="text-2xl font-bold text-gray-900">{data.user.leaveBalance.casual}</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
-            <DollarSign size={24} />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Latest Salary</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {data.latestSalary ? `${data.latestSalary.currency} ${data.latestSalary.basePay}` : "N/A"}
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-secondary">Employee Dashboard</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-primary sm:text-4xl">
+              Good morning, {data.user.name}
+            </h1>
+            <p className="mt-2 text-base text-on-surface-variant">
+              {data.user.designation} / {data.user.department}
             </p>
           </div>
-        </div>
-      </div>
+          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-surface-container-high px-4 py-2 text-sm font-semibold text-on-surface-variant">
+            <span className="h-2 w-2 rounded-full bg-secondary" />
+            AI context synced from your HR profile
+          </div>
+        </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Apply for Leave</h2>
-          <form onSubmit={handleApplyLeave} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Leave Type</label>
-              <select
-                value={leaveType}
-                onChange={(e) => setLeaveType(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="annual">Annual Leave</option>
-                <option value="sick">Sick Leave</option>
-                <option value="casual">Casual Leave</option>
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-                <input
-                  type="date"
-                  required
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-                <input
-                  type="date"
-                  required
-                  value={toDate}
-                  onChange={(e) => setToDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
-              <textarea
-                required
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                rows="3"
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              disabled={applying}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400"
-            >
-              {applying ? "Submitting..." : "Submit Application"}
-            </button>
-          </form>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Recent Leave History</h2>
-          <div className="space-y-4">
-            {data.recentLeaves?.length === 0 ? (
-              <p className="text-gray-500 text-sm">No recent leave requests.</p>
-            ) : (
-              data.recentLeaves?.map((leave) => (
-                <div key={leave._id} className="flex items-center justify-between p-4 border border-gray-100 rounded-lg bg-gray-50">
-                  <div>
-                    <p className="font-medium text-gray-900 capitalize">{leave.type} Leave</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(leave.fromDate).toLocaleDateString()} - {new Date(leave.toDate).toLocaleDateString()}
-                    </p>
+        <section className="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:col-span-8">
+            {leaveCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <div className="app-card flex min-h-40 flex-col justify-between p-6" key={card.label}>
+                  <div className="flex items-start justify-between">
+                    <span className={`rounded-lg ${card.bg} ${card.color} p-2`}>
+                      <Icon size={22} />
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-[0.1em] text-outline">Days left</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {leave.status === 'pending' && <span className="flex items-center gap-1 text-yellow-600 text-sm font-medium"><Clock size={16} /> Pending</span>}
-                    {leave.status === 'approved' && <span className="flex items-center gap-1 text-green-600 text-sm font-medium"><CheckCircle size={16} /> Approved</span>}
-                    {leave.status === 'rejected' && <span className="flex items-center gap-1 text-red-600 text-sm font-medium"><XCircle size={16} /> Rejected</span>}
+                  <div>
+                    <p className="text-4xl font-black text-primary">{card.value}</p>
+                    <h3 className="mt-1 text-lg font-bold text-on-surface">{card.label} Leave</h3>
                   </div>
                 </div>
-              ))
-            )}
+              );
+            })}
           </div>
-        </div>
+
+          <div className="relative overflow-hidden rounded-xl bg-primary-container p-6 text-white shadow-panel md:col-span-4">
+            <div className="relative z-10">
+              <h2 className="text-2xl font-black">Quick Actions</h2>
+              <p className="mt-2 text-sm text-slate-300">Common HR tasks without digging through menus.</p>
+              <div className="mt-6 space-y-3">
+                <a className="flex items-center justify-between rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm font-bold transition hover:bg-white/20" href="#apply-leave">
+                  Apply for Leave
+                  <Plus size={18} />
+                </a>
+                <button className="flex w-full items-center justify-between rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm font-bold transition hover:bg-white/20" type="button">
+                  Download Paystub
+                  <Download size={18} />
+                </button>
+              </div>
+            </div>
+            <Sparkles className="absolute -bottom-8 -right-8 text-white/10" size={150} />
+          </div>
+
+          <div className="app-card p-6 md:col-span-5">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-black text-primary">Salary Overview</h2>
+              <Banknote className="text-secondary" size={24} />
+            </div>
+            <div className="flex items-center gap-5">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary-container text-secondary">
+                <Banknote size={28} />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.12em] text-outline">Latest Pay Stub</p>
+                <p className="mt-1 text-3xl font-black text-primary">{salaryValue}</p>
+                <p className="text-sm italic text-on-surface-variant">{salary?.payPeriod || "No salary data uploaded yet"}</p>
+              </div>
+            </div>
+            <div className="mt-8 h-2 overflow-hidden rounded-full bg-surface-container">
+              <div className="h-full w-3/4 rounded-full bg-secondary" />
+            </div>
+            <div className="mt-3 flex justify-between text-xs font-bold uppercase tracking-[0.08em] text-outline">
+              <span>Base: {salary ? `${salary.currency} ${salary.basePay}` : "N/A"}</span>
+              <span>Bonus: {salary ? `${salary.currency} ${salary.bonus || 0}` : "N/A"}</span>
+            </div>
+          </div>
+
+          <div className="app-card overflow-hidden md:col-span-7">
+            <div className="flex items-center justify-between border-b border-outline-variant p-6">
+              <h2 className="text-2xl font-black text-primary">Recent Activity</h2>
+              <span className="rounded-full bg-surface-container px-3 py-1 text-xs font-bold text-on-surface-variant">Leave</span>
+            </div>
+            <div className="divide-y divide-outline-variant">
+              {data.recentLeaves?.length ? (
+                data.recentLeaves.map((leave) => {
+                  const Icon = statusIcons[leave.status] || Clock3;
+                  return (
+                    <div className="flex items-center gap-4 p-5 transition hover:bg-surface-container-low" key={leave._id}>
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container text-secondary">
+                        <Icon size={21} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold capitalize text-on-surface">{leave.type} leave</p>
+                        <p className="text-sm text-on-surface-variant">
+                          {formatDate(leave.fromDate)} - {formatDate(leave.toDate)}
+                        </p>
+                      </div>
+                      <span className={`rounded-full border px-3 py-1 text-xs font-bold capitalize ${statusStyles[leave.status] || statusStyles.pending}`}>
+                        {leave.status}
+                      </span>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="p-8 text-center text-sm text-on-surface-variant">No recent leave requests.</div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <section className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <div className="app-card p-6 lg:col-span-7" id="apply-leave">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="rounded-lg bg-secondary-container p-2 text-secondary">
+                <FileText size={22} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-primary">Apply for Leave</h2>
+                <p className="text-sm text-on-surface-variant">Submit a request for admin review.</p>
+              </div>
+            </div>
+            <form className="space-y-5" onSubmit={handleApplyLeave}>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <label className="field-label" htmlFor="leaveType">Leave Type</label>
+                  <select className="field-input" id="leaveType" onChange={(e) => setLeaveType(e.target.value)} value={leaveType}>
+                    <option value="annual">Annual Leave</option>
+                    <option value="sick">Sick Leave</option>
+                    <option value="casual">Casual Leave</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="field-label" htmlFor="fromDate">From Date</label>
+                  <input className="field-input" id="fromDate" onChange={(e) => setFromDate(e.target.value)} required type="date" value={fromDate} />
+                </div>
+                <div className="space-y-2">
+                  <label className="field-label" htmlFor="toDate">To Date</label>
+                  <input className="field-input" id="toDate" onChange={(e) => setToDate(e.target.value)} required type="date" value={toDate} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="field-label" htmlFor="reason">Reason</label>
+                <textarea
+                  className="field-input min-h-28 resize-none"
+                  id="reason"
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Add a short reason for your manager."
+                  required
+                  value={reason}
+                />
+              </div>
+              <button className="secondary-button w-full sm:w-auto" disabled={applying} type="submit">
+                {applying ? "Submitting..." : "Submit Application"}
+                <Send size={17} />
+              </button>
+            </form>
+          </div>
+
+          <div className="rounded-xl border border-secondary/20 bg-secondary-container/40 p-6 shadow-panel lg:col-span-5">
+            <div className="mb-4 flex items-center gap-2 text-secondary">
+              <Sparkles size={20} />
+              <span className="text-xs font-black uppercase tracking-[0.14em]">AI Suggestion</span>
+            </div>
+            <p className="text-lg font-bold leading-7 text-primary">
+              Ask the assistant: "How many leaves do I have?" or "Apply annual leave for tomorrow."
+            </p>
+            <p className="mt-3 text-sm leading-6 text-on-surface-variant">
+              The chat uses your employee profile, salary records, and recent leave history as context.
+            </p>
+          </div>
+        </section>
       </div>
       <Chatbot />
     </div>
